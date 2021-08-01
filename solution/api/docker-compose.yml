@@ -1,0 +1,22 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - /var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    build: .
+    container_name: api_challenge
+    command:  bash -c "python3 /api/manage.py makemigrations car_api && python3 /api/manage.py migrate && python3 /api/manage.py runserver"
+    volumes:
+      - .:/api
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
