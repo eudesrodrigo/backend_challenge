@@ -34,7 +34,7 @@ jobs:
     - name: Test with pytest
       run: |
         ls
-        cd api/
+        cd solution/api/
         
         # Install docker
         apt-get update
