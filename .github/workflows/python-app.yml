@@ -30,7 +30,8 @@ jobs:
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 . --count --exit-zer
+        o --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
         ls
@@ -38,9 +39,10 @@ jobs:
         
         # Install docker
         sudo apt-get update
-        sudo apt-get install apt-transport-https ca-certificates curl nupg lsb-release
-        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        sudo apt-get install docker-ce docker-ce-cli containerd.io
+        sudo apt install docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        docker --version
         
         # Docker compose install
         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
