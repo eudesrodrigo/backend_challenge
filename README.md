@@ -2,6 +2,7 @@
 This solution uses docker to create a testing enviroment.
 This solution uses Django testing module to test the car_api app Models.
 Since there is no need to keep this code safe the Django's SECRET_KEY was kept hard coded.
+Views were not seted up since the aim were to test the classes
 
 1. Clone this repository
    ```sh
