@@ -25,17 +25,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f solution/api/requirements.txt ]; then pip install -r solution/api/requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zer
-        o --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        ls
         cd solution/api/
+        ls
         
         # Install docker
         sudo apt-get update
@@ -48,6 +39,9 @@ jobs:
         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
         
+        
+    - name: Test with pytest
+      run: |
         # Run
         docker-compose up -d
         python manage.py test
