@@ -1,3 +1,36 @@
+# Getting Started
+This solution uses docker to create a testing enviroment.
+This solution uses Django testing module to test the car_api app Models.
+Since there is no need to keep this code safe the Django's SECRET_KEY was kept hard coded.
+
+1. Clone this repository
+   ```sh
+    git clone https://github.com/eudesrodrigo/backend_challenge
+   ```
+
+2. Navigate to solution > api on terminal
+
+3. Install docker
+   ```sh
+   https://docs.docker.com/get-docker/
+   ```
+   
+4. Run docker compose to setup the database (PostgreSQL) in detached mode
+   ```sh
+   docker-compose up -d
+   ```
+
+5. Install dependencies
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+4. Run django unity test module
+   ```sh
+   python manage.py test
+   ```
+
+
 # Backend Developer Challenge
 This is a simple challenge to test your skills on building APIs and your logic.
 It has to be done using Python and Django/Django Rest Framework

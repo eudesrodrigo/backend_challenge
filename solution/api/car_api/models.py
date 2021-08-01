@@ -10,47 +10,58 @@ TYRES_DEG_CREATE_LIMIT = 0.95
 TYRE_DEG_PER_KM = 0.01/3
 
 class Car(models.Model):
+    """
+    Car class
+    """
     id = models.BigAutoField(primary_key=True)
     total_gas_capacity = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(CAR_MAX_FUEL)], default=CAR_MAX_FUEL)
     gas_count = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1)], default=1)
 
     def trip(car, distance):
         traveled_distance = 0
-        for traveled_distance in range (1, distance + 1):
-            print(f"Traveled distance: {traveled_distance} Km")
+        tyre_count = Tyre.objects.filter(fk_car_id=car, degradation__lte=TYRES_DEG_CREATE_LIMIT).count()
 
-            # Update gas_count for each Km
-            car.gas_count -= (1/KM_PER_LITRE)/car.total_gas_capacity
-            if car.gas_count < 0:
-                car.gas_count = 0
-            
-            # Refuel if less then MIN_GAS_COUNT_BEFORE_REFUEL
-            if car.gas_count <= MIN_GAS_COUNT_BEFORE_REFUEL:
-                gas_quantity = (1-car.gas_count) * car.total_gas_capacity
-                Car.refuel(car=car, gas_quantity=gas_quantity)
+        if car.gas_count > 0 and tyre_count == MAX_CAR_TYRES:
+            # loop for trip: step-size 1km
+            for traveled_distance in range (1, distance + 1):
+                print(f"Traveled distance: {traveled_distance} Km")
 
-            # Degrade tyres
-            tyres = Tyre.objects.filter(fk_car_id=car, degradation__lte=1).all()
-
-            tire_degradated_more_95_counter = 0
-            for i, tyre in enumerate(tyres):
-                tyre.degradation += TYRE_DEG_PER_KM
-                print(f"Tyre {i} degradation: {tyre.degradation * 100} %")
-                tyre.save()
+                # Update gas_count for each Km
+                car.gas_count -= (1/KM_PER_LITRE)/car.total_gas_capacity
+                if car.gas_count < 0:
+                    car.gas_count = 0
                 
-                if tyre.degradation >= TYRES_DEG_CREATE_LIMIT:
-                    tire_degradated_more_95_counter += 1
-            
-                # Change tires when reach MIN_TYRE_DEG_BEFORE_CHANGE
-                if tyre.degradation >= MIN_TYRE_DEG_BEFORE_CHANGE:
-                    print("Swapping tyres")
-                    new_tyre = Car.create_tyre(car=car)
-                    if new_tyre is not None:
-                        tyre.delete()
+                # Refuel if less then MIN_GAS_COUNT_BEFORE_REFUEL
+                if car.gas_count <= MIN_GAS_COUNT_BEFORE_REFUEL:
+                    gas_quantity = (1-car.gas_count) * car.total_gas_capacity
+                    Car.refuel(car=car, gas_quantity=gas_quantity)
+                car.save()
 
-            print(f"Current gas_count: {car.gas_count * 100} %")
-            print("*"*50)
+                # Degrade tyres
+                tyres = Tyre.objects.filter(fk_car_id=car, degradation__lte=1).all()
 
+                tire_degradated_more_95_counter = 0
+                for i, tyre in enumerate(tyres):
+
+                    tyre.degradation += TYRE_DEG_PER_KM
+                    tyre.save()
+                    print(f"Tyre {i} degradation: {tyre.degradation * 100} %")
+                    
+                    
+                    if tyre.degradation >= TYRES_DEG_CREATE_LIMIT:
+                        tire_degradated_more_95_counter += 1
+                
+                    # Change tires when reach MIN_TYRE_DEG_BEFORE_CHANGE
+                    if tyre.degradation >= MIN_TYRE_DEG_BEFORE_CHANGE:
+                        print("Swapping tyres.")
+                        new_tyre = Car.create_tyre(car=car)
+                        if new_tyre is not None:
+                            tyre.delete()
+
+                print(f"Current gas_count: {car.gas_count * 100} %")
+                print("*"*50)
+        else:
+            print('You cannot travel because of gas or tyres!')
         car_status = Car.get_car_status(car.id)
         return car_status
 
@@ -68,7 +79,8 @@ class Car(models.Model):
 
     
     def maintenance(car_id, part):
-        print("Travel")
+        print("Maintenance")
+
 
     def create_car():
         car = Car.objects.create()
@@ -76,6 +88,7 @@ class Car(models.Model):
             Car.create_tyre(car=car)
 
         return Car.get_car_status(car.id)
+
 
     def get_car_status(car_id):
         car = Car.objects.filter(id=car_id).first()
@@ -85,6 +98,7 @@ class Car(models.Model):
                            "tyres_status": [tyre.degradation for tyre in tyres]}
 
         return dict_car_status
+
 
     def create_tyre(car):
 
@@ -96,14 +110,19 @@ class Car(models.Model):
             print("You can not create a new tyre because your car has 4 tyres in good conditions.")
             return None
 
+
     def __str__(self):
         return self.id
 
 
 class Tyre(models.Model):
+    """
+    Tyre class
+    """
     id = models.BigAutoField(primary_key=True)
     degradation = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1)], default=0)
     fk_car_id = models.ForeignKey(Car, on_delete=models.DO_NOTHING)
+    
     
     def __str__(self):
         return self.id

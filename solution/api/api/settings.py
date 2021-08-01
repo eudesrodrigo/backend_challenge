@@ -78,14 +78,12 @@ WSGI_APPLICATION = 'api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.dummy',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+stringConn = "postgresql://postgres:postgres@localhost:5432/postgres"
+DATABASES['default'] = dj_database_url.parse(stringConn)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
