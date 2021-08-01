@@ -43,6 +43,8 @@ jobs:
         
     - name: Install dependencies
       run: |
+        apt-get update
+        apt-get install build-essential -y
         python -m pip install --upgrade pip
         pip install git+https://github.com/giswqs/whitebox
         cd solution/api/
