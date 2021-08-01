@@ -43,10 +43,11 @@ jobs:
         
     - name: Install dependencies
       run: |
+        sudo apt-get install -y g++ libgtk-3-dev libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
+        
         apt-get update
         apt-get install build-essential -y
         python -m pip install --upgrade pip
-        pip install git+https://github.com/giswqs/whitebox
         cd solution/api/
         ls
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
