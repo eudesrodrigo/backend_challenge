@@ -11,11 +11,32 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Start containers
+      run: |
+        cd solutions/api/
+        docker-compose -f "docker-compose.yml" up -d --build
+
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Stop containers
+      if: always()
+      run: docker-compose -f "docker-compose.yml" down
+    - uses: actions/checkout@v2/docker-practice/actions-setup-docker@master
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -25,23 +46,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f solution/api/requirements.txt ]; then pip install -r solution/api/requirements.txt; fi
-        cd solution/api/
-        ls
-        
-        # Install docker
-        sudo apt-get update
-        sudo apt install docker.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        docker --version
-        
-        # Docker compose install
-        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
         
         
     - name: Test with pytest
       run: |
+        cd solution/api/
         # Run
         docker-compose up -d
         python manage.py test
