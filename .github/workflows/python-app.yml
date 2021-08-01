@@ -10,30 +10,32 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: node:10.18-jessie
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-
-    - name: Start containers
-      run: |
-        cd solutions/api/
-        docker-compose -f "docker-compose.yml" up -d --build
-
-    - name: Install node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run tests
-      run: npm run test
-
-    - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -48,6 +50,7 @@ jobs:
     - name: Test with pytest
       run: |
         cd solution/api/
+        ls
         # Run
         docker-compose up -d
         python manage.py test
