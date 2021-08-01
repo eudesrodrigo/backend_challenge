@@ -33,20 +33,17 @@ jobs:
     - name: Run tests
       run: npm run test
 
-    - name: Stop containers
-      if: always()
-      run: docker-compose -f "docker-compose.yml" down
-    - uses: actions/checkout@v2/docker-practice/actions-setup-docker@master
+    - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f solution/api/requirements.txt ]; then pip install -r solution/api/requirements.txt; fi
-        
         
     - name: Test with pytest
       run: |
